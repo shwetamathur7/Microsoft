@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="msal-web-sample:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>msal-web-sample</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="msal-web-sample-0.1.0.war">
+      <element id="artifact" artifact-name="msal-web-sample:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">  
+  <modelVersion>4.0.0</modelVersion>  
+  <parent> 
+    <groupId>org.springframework.boot</groupId>  
+    <artifactId>spring-boot-starter-parent</artifactId>  
+    <version>2.1.4.RELEASE</version>  
+    <relativePath/>  
+    <!-- lookup parent from repository --> 
+  </parent>  
+  <groupId>com.microsoft.azure</groupId>  
+  <artifactId>java-web-entity</artifactId>
+  <packaging>war</packaging>  
+  <version>0.1.0</version>  
+  <name>java-web-entity</name>
+  <description>Test application to call Identity Management</description>  
+  <properties> 
+    <java.version>1.8</java.version> 
+  </properties>  
+  <dependencies> 
+    <dependency> 
+      <groupId>com.microsoft.azure</groupId>  
+      <artifactId>msal4j</artifactId>  
+      <version>1.10.1</version> 
+    </dependency>  
+    <dependency> 
+      <groupId>org.json</groupId>  
+      <artifactId>json</artifactId>  
+      <version>20090211</version> 
+    </dependency>  
+    <dependency> 
+      <groupId>org.apache.commons</groupId>  
+      <artifactId>commons-lang3</artifactId>  
+      <version>3.9</version> 
+    </dependency>  
+    <!-- Spring 3 dependencies -->  
+    <dependency> 
+      <groupId>org.springframework.boot</groupId>  
+      <artifactId>spring-boot-starter-thymeleaf</artifactId> 
+    </dependency>  
+    <dependency> 
+      <groupId>org.springframework.boot</groupId>  
+      <artifactId>spring-boot-starter-web</artifactId> 
+    </dependency>  
+    <dependency> 
+      <groupId>org.springframework.boot</groupId>  
+      <artifactId>spring-boot-starter-test</artifactId>  
+      <scope>test</scope> 
+    </dependency>  
+    <dependency> 
+      <groupId>org.springframework.boot</groupId>  
+      <artifactId>spring-boot-starter-security</artifactId> 
+    </dependency> 
+  </dependencies>  
+  <build> 
+    <plugins> 
+      <plugin> 
+        <groupId>org.springframework.boot</groupId>  
+        <artifactId>spring-boot-maven-plugin</artifactId> 
+      </plugin>  
+      <plugin>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-webapp-maven-plugin</artifactId>
+        <version>1.12.0</version>
+        <configuration>
+          <schemaVersion>v2</schemaVersion>
+          <subscriptionId>6a9d5702-3cfb-4758-9dd5-1d3136fee72d</subscriptionId>
+          <resourceGroup>java-web-identity-1627036220809-rg</resourceGroup>
+          <appName>java-web-identity-1627036220809</appName>
+          <pricingTier>F1</pricingTier>
+          <region>central india</region>
+          <runtime>
+            <os>Windows</os>
+            <javaVersion>Java 8</javaVersion>
+            <webContainer>Tomcat 8.5</webContainer>
+          </runtime>
+          <deployment>
+            <resources>
+              <resource>
+                <directory>${project.basedir}/target</directory>
+                <includes>
+                  <include>*.war</include>
+                </includes>
+              </resource>
+            </resources>
+          </deployment>
+        </configuration>
+      </plugin>
+    </plugins> 
+  </build> 
+</project>

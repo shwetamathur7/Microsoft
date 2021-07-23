@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Application</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* Form Styling */
+        form {
+            display: inline-block;
+        }
+
+        /* Heading styling */
+        h2 {
+            text-align: center;
+        }
+
+        div {
+            text-align: center;
+        }
+
+        /* Button styling */
+        input,
+        button {
+            margin: 10px;
+            padding: 5px;
+            border-radius: 4px;
+            width: 120px;
+            cursor: pointer;
+            background-color: rgb(169, 207, 226);
+        }
+
+        /* Specific Buttons styling */
+        .sign_in {
+            margin-right: 20px;
+        }
+
+        .api {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        .profile {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<h2>Test Application</h2>
+<div>
+    <form  action="/identity/secure/aad">
+        <input type="submit" value="Login" class="btn btn-primary">
+    </form>
+    <form>
+                    <input type="button" value="API" class="api" />
+
+    </form>
+    <form action="/identity/graph/me">
+        <input type="submit" value="Profile" class="btn btn-info">
+    </form>
+
+</div>
+</body>
+</html>
