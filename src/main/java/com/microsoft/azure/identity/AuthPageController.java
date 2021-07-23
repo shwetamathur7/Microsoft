@@ -19,8 +19,12 @@ import com.nimbusds.jwt.JWTParser;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 
@@ -55,9 +59,30 @@ public class AuthPageController {
         response.sendRedirect(endSessionEndpoint + "?post_logout_redirect_uri=" +
                 URLEncoder.encode(redirectUrl, "UTF-8"));
     }
+    @RequestMapping("/client_api")
+    public ModelAndView callClientApi(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws Exception {
+
+        ModelAndView mav = new ModelAndView("auth_page");
+        String clientApiCallResult = null;
+        try {
+            setAccountInfo(mav, httpRequest);
+
+            IAuthenticationResult result = authHelper.getAuthResultBySilentFlow(httpRequest, authHelper.configuration.clientDefaultScope);
+            clientApiCallResult = callClientService(result.accessToken());
+        } catch (Exception ex) {
+            authHelper.removePrincipalFromSession(httpRequest);
+            httpResponse.setStatus(500);
+            httpRequest.setAttribute("error", ex.getMessage());
+            httpRequest.getRequestDispatcher("/error").forward(httpRequest, httpResponse);
+        }
+
+        mav.addObject("client_api_call_res", clientApiCallResult);
+        return mav;
+    }
+
 
     @RequestMapping("/identity/graph/me")
-    public ModelAndView getUserFromGraph(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
+    public ModelAndView getUserFromGraph(HttpServletRequest httpRequest, HttpServletResponse httpResponse,String scope)
             throws Throwable {
 
         IAuthenticationResult result;
@@ -108,7 +133,7 @@ public class AuthPageController {
         return mav;
     }
 
-    private String getUserInfoFromGraph(ModelAndView mav,String accessToken) throws Exception {
+    private void getUserInfoFromGraph(ModelAndView mav,String accessToken) throws Exception {
         // Microsoft Graph user endpoint
         URL url = new URL(authHelper.getMsGraphEndpointHost() + "v1.0/me");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -131,7 +156,7 @@ public class AuthPageController {
         mav.addObject("jobTitle", responseObject.getJSONObject("responseMsg").getString("jobTitle"));
         mav.addObject("userPrincipalName", responseObject.getJSONObject("responseMsg").getString("userPrincipalName"));
 
-        return responseObject.toString();
+
     }
 
     private void setAccountInfo(ModelAndView model, HttpServletRequest httpRequest) throws ParseException {
@@ -141,5 +166,16 @@ public class AuthPageController {
 
         model.addObject("tenantId", tenantId);
         model.addObject("account", SessionManagementHelper.getAuthSessionObject(httpRequest).account());
+    }
+    private String callClientService(String accessToken) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(null, headers);
+
+        return restTemplate.exchange("http://localhost:8081/get", HttpMethod.GET,
+                entity, String.class).getBody();
     }
 }

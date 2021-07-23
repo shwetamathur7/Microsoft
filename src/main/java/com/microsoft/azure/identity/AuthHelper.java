@@ -47,6 +47,7 @@ class AuthHelper {
     private String authority;
     private String redirectUriSignIn;
     private String redirectUriGraph;
+    private String clientDefaultScope;
     private String msGraphEndpointHost;
 
     @Autowired
@@ -59,6 +60,7 @@ class AuthHelper {
         clientSecret = configuration.getSecretKey();
         redirectUriSignIn = configuration.getRedirectUriSignin();
         redirectUriGraph = configuration.getRedirectUriGraph();
+        clientDefaultScope = configuration.getClientDefaultScope();
         msGraphEndpointHost = configuration.getMsGraphEndpointHost();
     }
 
@@ -94,6 +96,27 @@ class AuthHelper {
                     oidcResponse.getErrorObject().getDescription()));
         }
     }
+    IAuthenticationResult getAuthResultBySilentFlow(HttpServletRequest httpRequest, String scope) throws Exception {
+        IAuthenticationResult result = SessionManagementHelper.getAuthSessionObject(httpRequest);
+
+        ConfidentialClientApplication app;
+        app = createClientApplication();
+
+        Object tokenCache = httpRequest.getSession().getAttribute("token_cache");
+        if (tokenCache != null) {
+            app.tokenCache().deserialize(tokenCache.toString());
+        }
+
+        SilentParameters parameters = SilentParameters.builder(
+                Collections.singleton(scope),
+                result.account()).build();
+
+        IAuthenticationResult updatedResult = app.acquireTokenSilently(parameters).get();
+
+        //update session with latest token cache
+        SessionManagementHelper.storeTokenCacheInSession(httpRequest, app.tokenCache().serialize());
+        return updatedResult;
+    }
 
     IAuthenticationResult getAuthResultBySilentFlow(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
             throws Throwable {
@@ -125,11 +148,17 @@ class AuthHelper {
             throw new Exception(FAILED_TO_VALIDATE_MESSAGE + "could not validate nonce");
         }
     }
+    void setSessionPrincipal(HttpServletRequest httpRequest, IAuthenticationResult result) {
+        httpRequest.getSession().setAttribute(AuthHelper.PRINCIPAL_SESSION_NAME, result);
+    }
 
     private String getNonceClaimValueFromIdToken(String idToken) throws ParseException {
         return (String) JWTParser.parse(idToken).getJWTClaimsSet().getClaim("nonce");
     }
 
+    void removePrincipalFromSession(HttpServletRequest httpRequest) {
+        httpRequest.getSession().removeAttribute(AuthHelper.PRINCIPAL_SESSION_NAME);
+    }
     private void validateAuthRespMatchesAuthCodeFlow(AuthenticationSuccessResponse oidcResponse) throws Exception {
         if (oidcResponse.getIDToken() != null || oidcResponse.getAccessToken() != null ||
                 oidcResponse.getAuthorizationCode() == null) {

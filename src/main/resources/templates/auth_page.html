@@ -48,7 +48,18 @@
     </tbody>
 </table>
 </span>
+    </span>
 <br>
+ <form action="/client_api">
+    <input type="submit" value="Call Api" class="btn btn-primary">
+</form>
+
+<span th:if="${client_api_call_res != null}">
+    <h1> Api call:</h1>
+
+    <div  th:utext="${client_api_call_res}"></div>
+</span>
+
 <form action="/identity/sign_out">
     <input type="submit" value="Sign out" class="btn btn-danger">
 </form>

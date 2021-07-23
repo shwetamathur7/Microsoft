@@ -20,6 +20,8 @@ class BasicConfiguration {
     private String redirectUriGraph;
     private String secretKey;
     private String msGraphEndpointHost;
+     String clientDefaultScope;
+
 
     public String getAuthority(){
         if (!authority.endsWith("/")) {
@@ -60,12 +62,20 @@ class BasicConfiguration {
         return secretKey;
     }
 
+    public String getClientDefaultScope() {
+        return clientDefaultScope;
+    }
+
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
 
     public void setMsGraphEndpointHost(String msGraphEndpointHost) {
         this.msGraphEndpointHost = msGraphEndpointHost;
+    }
+
+    public void setClientDefaultScope(String clientDefaultScope) {
+        this.clientDefaultScope = clientDefaultScope;
     }
 
     public String getMsGraphEndpointHost(){

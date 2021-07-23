@@ -73,6 +73,13 @@ public class AuthFilter implements Filter {
                 if (isAccessTokenExpired(httpRequest)) {
                     updateAuthDataUsingSilentFlow(httpRequest, httpResponse);
                 }
+                if (isAccessTokenExpired(httpRequest)) {
+                    // Attempt to refresh tokens and session
+                    IAuthenticationResult result = authHelper.getAuthResultBySilentFlow(
+                            httpRequest,
+                            authHelper.configuration.getClientDefaultScope());
+                    authHelper.setSessionPrincipal(httpRequest, result);
+                }
             } catch (MsalException authException) {
                 // something went wrong (like expiration or revocation of token)
                 // we should invalidate AuthData stored in session and redirect to Authorization server
